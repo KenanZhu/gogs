@@ -502,6 +502,13 @@ func Activate(c *context.Context) {
 			return
 		}
 
+		// Send email notification after the activate.
+		if conf.Email.Enabled && conf.User.EnableEmailNotification {
+			if err := email.SendRegisterNotifyMail(c.Context, database.NewMailerUser(user)); err != nil {
+				log.Error("Failed to send register notify mail: %v", err)
+			}
+		}
+
 		log.Trace("User activated: %s", user.Name)
 
 		_ = c.Session.Set("uid", user.ID)
